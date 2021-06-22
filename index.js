@@ -1,6 +1,7 @@
+//install dependancies.
 const mysql = require('mysql2');
 const inquirer = require('inquirer'); 
-
+//create connection to sql workbench.
 const connection = mysql.createConnection({
     host: 'localhost',
 
@@ -15,7 +16,7 @@ connection.connect((err) => {
     if (err) throw err; 
     mainPrompt(); 
 });
-
+//main prompt for application.
 const mainPrompt = () => {
     inquirer.prompt({
         name: 'main',
@@ -30,7 +31,7 @@ const mainPrompt = () => {
             'View employees',
             'Update employees'
         ]
-
+//based on selected answer, deptermines which prompt to run. 
     }).then((answer) => {
         switch (answer.main) {
             case 'Add a department': addDepartment();
@@ -57,7 +58,7 @@ const mainPrompt = () => {
     })
 };
 
-
+//uses query to view departments from department table.
 const viewDepartments = () => {
     connection.query('SELECT * FROM employees.department', (err, res) => {
         if (err) throw err;
@@ -66,7 +67,7 @@ const viewDepartments = () => {
         mainPrompt();
     });
 };
-
+//uses query to view employees from employee table.
 const viewEmployees = () => {
     connection.query('SELECT * FROM employees.employee', (err, res) => {
         if (err) throw err;
@@ -75,7 +76,7 @@ const viewEmployees = () => {
         mainPrompt();
     });
 };
-
+//uses query to view roles from role table.
 const viewRoles = () => {
     connection.query('SELECT * FROM employees.role', (err, res) => {
         if (err) throw err;
@@ -84,7 +85,7 @@ const viewRoles = () => {
         mainPrompt();
     });
 };
-
+//selects department table and runs prompt to gather input for new role. 
 const addRole = () => {
     connection.query('SELECT * FROM employees.department', (err, res) => {
         if (err) throw err;
@@ -118,7 +119,7 @@ const addRole = () => {
                     depResult = role;
                 }
             })
-    
+    //uses query to insert selected role into role table.
             connection.query('INSERT INTO employees.role SET ?',
             {
                 title: answer.title, 
@@ -133,7 +134,7 @@ const addRole = () => {
         })
     })
 }
-
+//selects employes and role table, then runs prompt to gather employee info and role. 
 const addEmployee = () => {
     connection.query('SELECT * FROM employees.employee, employees.role', (err, res) => {
         if (err) throw err;
@@ -168,7 +169,7 @@ const addEmployee = () => {
                     roleResult = role;
                 }
             })
-
+//uses query to insert employee into employee table and role id. 
             connection.query('INSERT INTO employees.employee SET ?',
             {
                 first_name: answer.first_name, 
@@ -184,7 +185,7 @@ const addEmployee = () => {
         })
     });
 }
-
+// selects department table and runs prompt to gather new department name.
 const addDepartment = () => {
     connection.query('SELECT * FROM employees.department', (err, res) => {
         if (err) throw err;
@@ -195,7 +196,7 @@ const addDepartment = () => {
                 message: 'enter new department',
             }
         ]).then((answer)=>{
-
+//uses query to insert new department to department table.
             connection.query('INSERT INTO employees.department SET ?',
             {
                 name: answer.department
@@ -208,7 +209,7 @@ const addDepartment = () => {
         })
     });
 }
-
+//selects employee from employee table and role, loops through to find select employee to update.
 const updateEmployees = () => {
     connection.query('SELECT * FROM employees.employee, employees.role', (err, res)=>{
         if (err) throw err;
@@ -226,6 +227,7 @@ const updateEmployees = () => {
                 },
                 message: 'choose an employee to update'
             },
+//selects role, loops through to find select role to update.
             {
                 name: 'role',
                 type: 'rawlist',
@@ -253,7 +255,7 @@ const updateEmployees = () => {
                     selectRole = role;
                 }
             })
-
+//uses query to add updated data to employee table. 
             connection.query('UPDATE employees.employee SET ? WHERE ?',
             [
                 {
